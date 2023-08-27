@@ -1,4 +1,4 @@
-# Strategy Demo
+# Strategy Oscillator
 
 [![Status][gha-image-check-master]][gha-link-check-master]
 [![Status][gha-image-compile-master]][gha-link-compile-master]
@@ -8,22 +8,18 @@
 [![Twitter][twitter-image]][twitter-link]
 [![Edit][gh-edit-badge]][gh-edit-link]
 
-Strategy based on the Demo indicator.
+Strategy based on the Oscillator indicator.
 
 ## Description
 
-This is example demo strategy for the demonstration purposes.
+This is example oscillator strategy for the oscillatornstration purposes.
 
 ## Dependencies
 
 | Tag      | Framework |
 |:--------:|:---------:|
-| v1.000   | v2.000    |
-| v1.001   | v2.001    |
-| ...      | ...       |
-| v1.012   | v2.012    |
-| v1.013   | v2.013    |
 | v2.000   | v3.000.1  |
+| v2.001   | v3.001.1  |
 
 <!-- Named links -->
 
@@ -31,12 +27,12 @@ This is example demo strategy for the demonstration purposes.
 [gh-discuss-link]: https://github.com/EA31337/EA31337-Strategies/discussions
 
 [gh-edit-badge]: https://img.shields.io/badge/GitHub-edit-purple.svg?logo=github
-[gh-edit-link]: https://github.dev/EA31337/Strategy-Demo
+[gh-edit-link]: https://github.dev/EA31337/Strategy-Oscillator
 
-[gha-link-check-master]: https://github.com/EA31337/Strategy-Demo/actions?query=workflow:Check+branch%3Amaster
-[gha-image-check-master]: https://github.com/EA31337/Strategy-Demo/workflows/Check/badge.svg?branch=master
-[gha-link-compile-master]: https://github.com/EA31337/Strategy-Demo/actions?query=workflow:Compile+branch%3Amaster
-[gha-image-compile-master]: https://github.com/EA31337/Strategy-Demo/workflows/Compile/badge.svg?branch=master
+[gha-link-check-master]: https://github.com/EA31337/Strategy-Oscillator/actions?query=workflow:Check+branch%3Amaster
+[gha-image-check-master]: https://github.com/EA31337/Strategy-Oscillator/workflows/Check/badge.svg?branch=master
+[gha-link-compile-master]: https://github.com/EA31337/Strategy-Oscillator/actions?query=workflow:Compile+branch%3Amaster
+[gha-image-compile-master]: https://github.com/EA31337/Strategy-Oscillator/workflows/Compile/badge.svg?branch=master
 
 [license-image]: https://img.shields.io/github/license/EA31337/EA31337-Strategies.svg
 [license-link]: https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)
