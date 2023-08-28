@@ -10,6 +10,19 @@
 #include <EA31337-classes/EA.mqh>
 #include <EA31337-classes/Indicators/Indi_AC.mqh>
 #include <EA31337-classes/Indicators/Indi_AD.mqh>
+#include <EA31337-classes/Indicators/Indi_ADX.mqh>
+#include <EA31337-classes/Indicators/Indi_AO.mqh>
+#include <EA31337-classes/Indicators/Indi_ATR.mqh>
+#include <EA31337-classes/Indicators/Indi_BWMFI.mqh>
+#include <EA31337-classes/Indicators/Indi_BearsPower.mqh>
+#include <EA31337-classes/Indicators/Indi_BullsPower.mqh>
+#include <EA31337-classes/Indicators/Indi_CCI.mqh>
+#include <EA31337-classes/Indicators/Indi_CHO.mqh>
+#include <EA31337-classes/Indicators/Indi_CHV.mqh>
+#include <EA31337-classes/Indicators/Indi_DeMarker.mqh>
+#include <EA31337-classes/Indicators/Indi_MFI.mqh>
+#include <EA31337-classes/Indicators/Indi_Momentum.mqh>
+#include <EA31337-classes/Indicators/Indi_OBV.mqh>
 #include <EA31337-classes/Indicators/Indi_RSI.mqh>
 #include <EA31337-classes/Indicators/Indi_Stochastic.mqh>
 #include <EA31337-classes/Indicators/Indi_WPR.mqh>
@@ -28,7 +41,7 @@ input bool Info_On_Chart = true;          // Display info on chart.
 // Defines.
 #define ea_name "Strategy Oscillator"
 #define ea_version "2.000"
-#define ea_desc "Strategy based on EA31337 framework."
+#define ea_desc "Strategy based on selected oscillator-type multi-valued indicators."
 #define ea_link "https://github.com/EA31337/Strategy-Oscillator"
 #define ea_author "EA31337 Ltd"
 
