@@ -7,6 +7,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_0_NONE = 0,  // (None)
   STG_OSCILLATOR_TYPE_AC,          // AC
   STG_OSCILLATOR_TYPE_AD,          // AD
+  STG_OSCILLATOR_TYPE_AO,          // Awesome
   STG_OSCILLATOR_TYPE_CCI,         // CCI
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
@@ -40,22 +41,24 @@ INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_AC_SourceType = IDATA_BUILTIN;  // 
 INPUT_GROUP("Oscillator strategy: AD oscillator params");
 INPUT int Oscillator_Indi_AD_Shift = 0;                                      // Shift
 INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_AD_SourceType = IDATA_BUILTIN;  // Source type
-INPUT_GROUP("Oscillator strategy: CCI indicator params");
+INPUT_GROUP("Oscillator strategy: Awesome oscillator params");
+INPUT int Oscillator_Indi_Awesome_Shift = 0;  // Shift
+INPUT_GROUP("Oscillator strategy: CCI oscillator params");
 INPUT int Oscillator_Indi_CCI_Period = 20;                                   // Period
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_CCI_Applied_Price = PRICE_TYPICAL;  // Applied Price
 INPUT int Oscillator_Indi_CCI_Shift = 0;                                     // Shift
-INPUT_GROUP("Oscillator strategy: RSI indicator params");
+INPUT_GROUP("Oscillator strategy: RSI oscillator params");
 INPUT int Oscillator_Indi_RSI_Period = 16;                                    // Period
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_RSI_Applied_Price = PRICE_WEIGHTED;  // Applied Price
 INPUT int Oscillator_Indi_RSI_Shift = 0;                                      // Shift
-INPUT_GROUP("Oscillator strategy: Stochastic indicator params");
+INPUT_GROUP("Oscillator strategy: Stochastic oscillator params");
 INPUT int Oscillator_Indi_Stochastic_KPeriod = 8;                      // K line period
 INPUT int Oscillator_Indi_Stochastic_DPeriod = 12;                     // D line period
 INPUT int Oscillator_Indi_Stochastic_Slowing = 12;                     // Slowing
 INPUT ENUM_MA_METHOD Oscillator_Indi_Stochastic_MA_Method = MODE_EMA;  // Moving Average method
 INPUT ENUM_STO_PRICE Oscillator_Indi_Stochastic_Price_Field = 0;       // Price (0 - Low/High or 1 - Close/Close)
 INPUT int Oscillator_Indi_Stochastic_Shift = 0;                        // Shift
-INPUT_GROUP("Oscillator strategy: WPR indicator params");
+INPUT_GROUP("Oscillator strategy: WPR oscillator params");
 INPUT int Oscillator_Indi_WPR_Period = 18;  // Period
 INPUT int Oscillator_Indi_WPR_Shift = 0;    // Shift
 
@@ -106,6 +109,10 @@ class Stg_Oscillator : public Strategy {
         _result &= dynamic_cast<Indi_AD *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_AD *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
+      case STG_OSCILLATOR_TYPE_AO:
+        _result &= dynamic_cast<Indi_AO *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_AO *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
       case STG_OSCILLATOR_TYPE_CCI:
         _result &= dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
@@ -150,11 +157,19 @@ class Stg_Oscillator : public Strategy {
         SetIndicator(new Indi_AD(ad_params), ::Oscillator_Type);
         break;
       }
+      case STG_OSCILLATOR_TYPE_AO:  // AO
+      {
+        IndiAOParams _indi_params(::Oscillator_Indi_Awesome_Shift);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_AO(_indi_params), ::Oscillator_Type);
+        break;
+      }
       case STG_OSCILLATOR_TYPE_CCI:  // CCI
       {
-        IndiCCIParams _indi_params(::Oscillator_Indi_CCI_Period, ::Oscillator_Indi_CCI_Applied_Price, ::Oscillator_Indi_CCI_Shift);
+        IndiCCIParams _indi_params(::Oscillator_Indi_CCI_Period, ::Oscillator_Indi_CCI_Applied_Price,
+                                   ::Oscillator_Indi_CCI_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
-        SetIndicator(new Indi_CCI(_indi_params));
+        SetIndicator(new Indi_CCI(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_RSI:  // RSI
