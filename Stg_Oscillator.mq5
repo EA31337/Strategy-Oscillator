@@ -10,6 +10,7 @@
 #include <EA31337-classes/EA.mqh>
 #include <EA31337-classes/Indicators/Indi_AC.mqh>
 #include <EA31337-classes/Indicators/Indi_AD.mqh>
+#include <EA31337-classes/Indicators/Indi_CCI.mqh>
 #include <EA31337-classes/Indicators/Indi_RSI.mqh>
 #include <EA31337-classes/Indicators/Indi_Stochastic.mqh>
 #include <EA31337-classes/Indicators/Indi_WPR.mqh>

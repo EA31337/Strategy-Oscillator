@@ -7,6 +7,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_0_NONE = 0,  // (None)
   STG_OSCILLATOR_TYPE_AC,          // AC
   STG_OSCILLATOR_TYPE_AD,          // AD
+  STG_OSCILLATOR_TYPE_CCI,         // CCI
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
   STG_OSCILLATOR_TYPE_WPR,         // WPR
@@ -39,6 +40,10 @@ INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_AC_SourceType = IDATA_BUILTIN;  // 
 INPUT_GROUP("Oscillator strategy: AD oscillator params");
 INPUT int Oscillator_Indi_AD_Shift = 0;                                      // Shift
 INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_AD_SourceType = IDATA_BUILTIN;  // Source type
+INPUT_GROUP("Oscillator strategy: CCI indicator params");
+INPUT int Oscillator_Indi_CCI_Period = 20;                                   // Period
+INPUT ENUM_APPLIED_PRICE Oscillator_Indi_CCI_Applied_Price = PRICE_TYPICAL;  // Applied Price
+INPUT int Oscillator_Indi_CCI_Shift = 0;                                     // Shift
 INPUT_GROUP("Oscillator strategy: RSI indicator params");
 INPUT int Oscillator_Indi_RSI_Period = 16;                                    // Period
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_RSI_Applied_Price = PRICE_WEIGHTED;  // Applied Price
@@ -101,6 +106,10 @@ class Stg_Oscillator : public Strategy {
         _result &= dynamic_cast<Indi_AD *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_AD *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
+      case STG_OSCILLATOR_TYPE_CCI:
+        _result &= dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
       case STG_OSCILLATOR_TYPE_RSI:
         _result &= dynamic_cast<Indi_RSI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_RSI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
@@ -139,6 +148,13 @@ class Stg_Oscillator : public Strategy {
         ad_params.SetDataSourceType(Oscillator_Indi_AD_SourceType);
         ad_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_AD(ad_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_CCI:  // CCI
+      {
+        IndiCCIParams _indi_params(::Oscillator_Indi_CCI_Period, ::Oscillator_Indi_CCI_Applied_Price, ::Oscillator_Indi_CCI_Shift);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_CCI(_indi_params));
         break;
       }
       case STG_OSCILLATOR_TYPE_RSI:  // RSI
