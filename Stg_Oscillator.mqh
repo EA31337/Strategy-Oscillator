@@ -14,10 +14,10 @@ enum ENUM_STG_OSCILLATOR_TYPE {
 
 // User input params.
 INPUT_GROUP("Oscillator strategy: main strategy params");
-INPUT ENUM_STG_OSCILLATOR_TYPE Oscillator_Type = STG_OSCILLATOR_TYPE_STOCH; // Oscillator type
+INPUT ENUM_STG_OSCILLATOR_TYPE Oscillator_Type = STG_OSCILLATOR_TYPE_RSI;  // Oscillator type
 INPUT_GROUP("Oscillator strategy: strategy params");
 INPUT float Oscillator_LotSize = 0;                // Lot size
-INPUT int Oscillator_SignalOpenMethod = 0;         // Signal open method
+INPUT int Oscillator_SignalOpenMethod = 6;         // Signal open method
 INPUT float Oscillator_SignalOpenLevel = 0;        // Signal open level
 INPUT int Oscillator_SignalOpenFilterMethod = 32;  // Signal open filter method
 INPUT int Oscillator_SignalOpenFilterTime = 3;     // Signal open filter time (0-31)
@@ -176,6 +176,7 @@ class Stg_Oscillator : public Strategy {
    */
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method, float _level = 0.0f, int _shift = 0) {
     IndicatorBase *_indi = GetIndicator(::Oscillator_Type);
+    // uint _ishift = _indi.GetShift();
     bool _result = Oscillator_Type != STG_OSCILLATOR_TYPE_0_NONE && IsValidEntry(_indi, _shift);
     if (!_result) {
       // Returns false when indicator data is not valid.
@@ -186,11 +187,25 @@ class Stg_Oscillator : public Strategy {
         // Buy signal.
         _result &= _indi.IsIncreasing(1, 0, _shift);
         _result &= _indi.IsIncByPct(_level, 0, _shift, 2);
+        if (_result && _method != 0) {
+          if (METHOD(_method, 0)) _result &= _indi.IsDecreasing(1, 0, _shift + 1);
+          if (METHOD(_method, 1)) _result &= _indi.IsIncreasing(4, 0, _shift + 3);
+          if (METHOD(_method, 2))
+            _result &= fmax4(_indi[_shift][0], _indi[_shift + 1][0], _indi[_shift + 2][0], _indi[_shift + 3][0]) ==
+                       _indi[_shift][0];
+        }
         break;
       case ORDER_TYPE_SELL:
         // Sell signal.
         _result &= _indi.IsDecreasing(1, 0, _shift);
         _result &= _indi.IsDecByPct(_level, 0, _shift, 2);
+        if (_result && _method != 0) {
+          if (METHOD(_method, 0)) _result &= _indi.IsIncreasing(1, 0, _shift + 1);
+          if (METHOD(_method, 1)) _result &= _indi.IsDecreasing(4, 0, _shift + 3);
+          if (METHOD(_method, 2))
+            _result &= fmin4(_indi[_shift][0], _indi[_shift + 1][0], _indi[_shift + 2][0], _indi[_shift + 3][0]) ==
+                       _indi[_shift][0];
+        }
         break;
     }
     return _result;
