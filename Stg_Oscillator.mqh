@@ -20,7 +20,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
 
 // User input params.
 INPUT_GROUP("Oscillator strategy: main strategy params");
-INPUT ENUM_STG_OSCILLATOR_TYPE Oscillator_Type = STG_OSCILLATOR_TYPE_RSI;  // Oscillator type
+INPUT ENUM_STG_OSCILLATOR_TYPE Oscillator_Type = STG_OSCILLATOR_TYPE_CCI;  // Oscillator type
 INPUT_GROUP("Oscillator strategy: strategy params");
 INPUT float Oscillator_LotSize = 0;                // Lot size
 INPUT int Oscillator_SignalOpenMethod = 6;         // Signal open method
