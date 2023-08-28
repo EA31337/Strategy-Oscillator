@@ -8,6 +8,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_AC,          // AC
   STG_OSCILLATOR_TYPE_AD,          // AD
   STG_OSCILLATOR_TYPE_AO,          // Awesome
+  STG_OSCILLATOR_TYPE_ATR,         // ATR
   STG_OSCILLATOR_TYPE_CCI,         // CCI
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
@@ -41,6 +42,9 @@ INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_AC_SourceType = IDATA_BUILTIN;  // 
 INPUT_GROUP("Oscillator strategy: AD oscillator params");
 INPUT int Oscillator_Indi_AD_Shift = 0;                                      // Shift
 INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_AD_SourceType = IDATA_BUILTIN;  // Source type
+INPUT_GROUP("Oscillator strategy: ATR oscillator params");
+INPUT int Oscillator_Indi_ATR_Period = 13;  // Period
+INPUT int Oscillator_Indi_ATR_Shift = 0;    // Shift
 INPUT_GROUP("Oscillator strategy: Awesome oscillator params");
 INPUT int Oscillator_Indi_Awesome_Shift = 0;  // Shift
 INPUT_GROUP("Oscillator strategy: CCI oscillator params");
@@ -113,6 +117,10 @@ class Stg_Oscillator : public Strategy {
         _result &= dynamic_cast<Indi_AO *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_AO *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
+      case STG_OSCILLATOR_TYPE_ATR:
+        _result &= dynamic_cast<Indi_ATR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_ATR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
       case STG_OSCILLATOR_TYPE_CCI:
         _result &= dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
@@ -162,6 +170,13 @@ class Stg_Oscillator : public Strategy {
         IndiAOParams _indi_params(::Oscillator_Indi_Awesome_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_AO(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_ATR:  // ATR
+      {
+        IndiATRParams _indi_params(::Oscillator_Indi_ATR_Period, ::Oscillator_Indi_ATR_Shift);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_ATR(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_CCI:  // CCI
