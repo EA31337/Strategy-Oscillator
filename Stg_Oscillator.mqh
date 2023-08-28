@@ -24,6 +24,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STDDEV,      // StdDev: Standard Deviation
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
+  STG_OSCILLATOR_TYPE_UO,          // UO: Ultimate Oscillator
   STG_OSCILLATOR_TYPE_WPR,         // WPR
 };
 
@@ -132,6 +133,15 @@ INPUT int Oscillator_Indi_Stochastic_Slowing = 12;                     // Slowin
 INPUT ENUM_MA_METHOD Oscillator_Indi_Stochastic_MA_Method = MODE_EMA;  // Moving Average method
 INPUT ENUM_STO_PRICE Oscillator_Indi_Stochastic_Price_Field = 0;       // Price (0 - Low/High or 1 - Close/Close)
 INPUT int Oscillator_Indi_Stochastic_Shift = 0;                        // Shift
+INPUT_GROUP("Oscillator strategy: Ultimate oscillator params");
+INPUT int Oscillator_Indi_UO_InpFastPeriod = 7;                              // Fast ATR period
+INPUT int Oscillator_Indi_UO_InpMiddlePeriod = 14;                           // Middle ATR period
+INPUT int Oscillator_Indi_UO_InpSlowPeriod = 28;                             // Slow ATR period
+INPUT int Oscillator_Indi_UO_InpFastK = 4;                                   // Fast K
+INPUT int Oscillator_Indi_UO_InpMiddleK = 2;                                 // Middle K
+INPUT int Oscillator_Indi_UO_InpSlowK = 1;                                   // Slow K
+INPUT int Oscillator_Indi_UO_Shift = 0;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_UO_SourceType = IDATA_BUILTIN;  // Source type
 INPUT_GROUP("Oscillator strategy: WPR oscillator params");
 INPUT int Oscillator_Indi_WPR_Period = 18;  // Period
 INPUT int Oscillator_Indi_WPR_Shift = 0;    // Shift
@@ -231,6 +241,10 @@ class Stg_Oscillator : public Strategy {
         _result &= dynamic_cast<Indi_OBV *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_OBV *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
+      case STG_OSCILLATOR_TYPE_PVT:
+        _result &= dynamic_cast<Indi_PriceVolumeTrend *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_PriceVolumeTrend *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
       case STG_OSCILLATOR_TYPE_ROC:
         _result &= dynamic_cast<Indi_RateOfChange *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_RateOfChange *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
@@ -247,9 +261,9 @@ class Stg_Oscillator : public Strategy {
         _result &= dynamic_cast<Indi_Stochastic *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_Stochastic *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
-      case STG_OSCILLATOR_TYPE_PVT:
-        _result &= dynamic_cast<Indi_PriceVolumeTrend *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
-                   dynamic_cast<Indi_PriceVolumeTrend *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+      case STG_OSCILLATOR_TYPE_UO:
+        _result &= dynamic_cast<Indi_UltimateOscillator *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_UltimateOscillator *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
       case STG_OSCILLATOR_TYPE_WPR:
         _result &= dynamic_cast<Indi_WPR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
@@ -349,6 +363,13 @@ class Stg_Oscillator : public Strategy {
         SetIndicator(new Indi_CHV(_indi_params), ::Oscillator_Type);
         break;
       }
+      case STG_OSCILLATOR_TYPE_DEMARKER:  // DeMarker
+      {
+        IndiDeMarkerParams _indi_params(::Oscillator_Indi_DeMarker_Period, ::Oscillator_Indi_DeMarker_Shift);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_DeMarker(_indi_params), ::Oscillator_Type);
+        break;
+      }
       case STG_OSCILLATOR_TYPE_MFI:  // MFI
       {
         IndiMFIParams _indi_params(::Oscillator_Indi_MFI_MA_Period, ::Oscillator_Indi_MFI_Applied_Volume,
@@ -383,7 +404,8 @@ class Stg_Oscillator : public Strategy {
       }
       case STG_OSCILLATOR_TYPE_ROC:  // ROC
       {
-        IndiRateOfChangeParams _indi_params(::Oscillator_Indi_ROC_Period, ::Oscillator_Indi_ROC_Applied_Price, ::Oscillator_Indi_ROC_Shift);
+        IndiRateOfChangeParams _indi_params(::Oscillator_Indi_ROC_Period, ::Oscillator_Indi_ROC_Applied_Price,
+                                            ::Oscillator_Indi_ROC_Shift);
         _indi_params.SetDataSourceType(::Oscillator_Indi_ROC_SourceType);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_RateOfChange(_indi_params), ::Oscillator_Type);
@@ -395,13 +417,6 @@ class Stg_Oscillator : public Strategy {
                                    ::Oscillator_Indi_RSI_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_RSI(_indi_params), ::Oscillator_Type);
-        break;
-      }
-      case STG_OSCILLATOR_TYPE_DEMARKER:  // DeMarker
-      {
-        IndiDeMarkerParams _indi_params(::Oscillator_Indi_DeMarker_Period, ::Oscillator_Indi_DeMarker_Shift);
-        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
-        SetIndicator(new Indi_DeMarker(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_STDDEV:  // StdDev
@@ -421,6 +436,17 @@ class Stg_Oscillator : public Strategy {
                                      ::Oscillator_Indi_Stochastic_Price_Field, ::Oscillator_Indi_Stochastic_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_Stochastic(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_UO:  // UO
+      {
+        IndiUltimateOscillatorParams _indi_params(
+            ::Oscillator_Indi_UO_InpFastPeriod, ::Oscillator_Indi_UO_InpMiddlePeriod,
+            ::Oscillator_Indi_UO_InpSlowPeriod, ::Oscillator_Indi_UO_InpFastK, ::Oscillator_Indi_UO_InpMiddleK,
+            ::Oscillator_Indi_UO_InpSlowK, ::Oscillator_Indi_UO_Shift);
+        _indi_params.SetDataSourceType(::Oscillator_Indi_UO_SourceType);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_UltimateOscillator(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_WPR:  // WPR
