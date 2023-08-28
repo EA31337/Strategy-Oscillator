@@ -28,7 +28,7 @@ input bool Info_On_Chart = true;          // Display info on chart.
 // Defines.
 #define ea_name "Strategy Oscillator"
 #define ea_version "2.000"
-#define ea_desc "Strategy based on EA31337 framework."
+#define ea_desc "Strategy based on selected oscillator-type single-valued indicators."
 #define ea_link "https://github.com/EA31337/Strategy-Oscillator"
 #define ea_author "EA31337 Ltd"
 
