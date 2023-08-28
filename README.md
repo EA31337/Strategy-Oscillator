@@ -8,11 +8,9 @@
 [![Twitter][twitter-image]][twitter-link]
 [![Edit][gh-edit-badge]][gh-edit-link]
 
-Strategy based on the Oscillator indicator.
-
 ## Description
 
-This is example oscillator strategy for the oscillatornstration purposes.
+Strategy based on selected oscillator-type single-valued indicators.
 
 ## Dependencies
 
