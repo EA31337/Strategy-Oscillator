@@ -11,6 +11,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_ATR,         // ATR
   STG_OSCILLATOR_TYPE_BEARS,       // Bears Power
   STG_OSCILLATOR_TYPE_BULLS,       // Bulls Power
+  STG_OSCILLATOR_TYPE_BWMFI,       // BWMFI
   STG_OSCILLATOR_TYPE_CCI,         // CCI
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
@@ -57,6 +58,9 @@ INPUT_GROUP("Oscillator strategy: BullsPower oscillator params");
 INPUT int Oscillator_Indi_BullsPower_Period = 30;                                 // Period
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_BullsPower_Applied_Price = PRICE_CLOSE;  // Applied Price
 INPUT int Oscillator_Indi_BullsPower_Shift = 0;                                   // Shift
+INPUT_GROUP("Oscillator strategy: BWMFI oscillator params");
+INPUT int Oscillator_Indi_BWMFI_Shift = 1;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_BWMFI_SourceType = IDATA_BUILTIN;  // Source type
 INPUT_GROUP("Oscillator strategy: CCI oscillator params");
 INPUT int Oscillator_Indi_CCI_Period = 20;                                   // Period
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_CCI_Applied_Price = PRICE_TYPICAL;  // Applied Price
@@ -139,6 +143,10 @@ class Stg_Oscillator : public Strategy {
         _result &= dynamic_cast<Indi_BullsPower *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_BullsPower *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
+      case STG_OSCILLATOR_TYPE_BWMFI:
+        _result &= dynamic_cast<Indi_BWMFI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_BWMFI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
       case STG_OSCILLATOR_TYPE_CCI:
         _result &= dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
@@ -213,6 +221,13 @@ class Stg_Oscillator : public Strategy {
                                           ::Oscillator_Indi_BullsPower_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_BullsPower(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_BWMFI:  // BWMFI
+      {
+        IndiBWIndiMFIParams _indi_params(::Oscillator_Indi_BWMFI_Shift);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_BWMFI(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_CCI:  // CCI
