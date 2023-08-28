@@ -19,6 +19,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_MFI,         // MFI
   STG_OSCILLATOR_TYPE_MOM,         // MOM: Momentum
   STG_OSCILLATOR_TYPE_OBV,         // OBV: On Balance Volume
+  STG_OSCILLATOR_TYPE_PVT,         // PVT: Price and Volume Trend
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STDDEV,      // StdDev: Standard Deviation
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
@@ -103,6 +104,10 @@ INPUT_GROUP("Oscillator strategy: OBV oscillator params");
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_OBV_Applied_Price = PRICE_CLOSE;     // Applied Price
 INPUT int Oscillator_Indi_OBV_Shift = 1;                                      // Shift
 INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_OBV_SourceType = IDATA_BUILTIN;  // Source type
+INPUT_GROUP("Oscillator strategy: PVT oscillator params");
+INPUT ENUM_APPLIED_VOLUME Oscillator_Indi_PVT_InpVolumeType = VOLUME_TICK;    // Volumes
+INPUT int Oscillator_Indi_PVT_Shift = 0;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_PVT_SourceType = IDATA_BUILTIN;  // Source type
 INPUT_GROUP("Oscillator strategy: RSI oscillator params");
 INPUT int Oscillator_Indi_RSI_Period = 16;                                    // Period
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_RSI_Applied_Price = PRICE_WEIGHTED;  // Applied Price
@@ -232,6 +237,10 @@ class Stg_Oscillator : public Strategy {
         _result &= dynamic_cast<Indi_Stochastic *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_Stochastic *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
+      case STG_OSCILLATOR_TYPE_PVT:
+        _result &= dynamic_cast<Indi_PriceVolumeTrend *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_PriceVolumeTrend *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
       case STG_OSCILLATOR_TYPE_WPR:
         _result &= dynamic_cast<Indi_WPR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_WPR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
@@ -352,6 +361,14 @@ class Stg_Oscillator : public Strategy {
         IndiOBVParams _indi_params(::Oscillator_Indi_OBV_Applied_Price, ::Oscillator_Indi_OBV_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_OBV(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_PVT:  // PVT
+      {
+        IndiPriceVolumeTrendParams _indi_params(::Oscillator_Indi_PVT_InpVolumeType, ::Oscillator_Indi_PVT_Shift);
+        _indi_params.SetDataSourceType(::Oscillator_Indi_PVT_SourceType);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_PriceVolumeTrend(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_RSI:  // RSI
