@@ -32,6 +32,7 @@
 #include <EA31337-classes/Indicators/Indi_UltimateOscillator.mqh>
 #include <EA31337-classes/Indicators/Indi_Volumes.mqh>
 #include <EA31337-classes/Indicators/Indi_WPR.mqh>
+#include <EA31337-classes/Indicators/Indi_WilliamsAD.mqh>
 // #include <EA31337-classes/Indicators/Oscillator/includes.h>
 #include <EA31337-classes/Strategy.mqh>
 

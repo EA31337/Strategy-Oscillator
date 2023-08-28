@@ -5,8 +5,8 @@
 
 enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_0_NONE = 0,  // (None)
-  STG_OSCILLATOR_TYPE_AC,          // AC
-  STG_OSCILLATOR_TYPE_AD,          // AD
+  STG_OSCILLATOR_TYPE_AC,          // AC: Accelerator/Decelerator
+  STG_OSCILLATOR_TYPE_AD,          // AD: Accumulation/Distribution
   STG_OSCILLATOR_TYPE_AO,          // AO: Awesome
   STG_OSCILLATOR_TYPE_ATR,         // ATR
   STG_OSCILLATOR_TYPE_BEARS,       // Bears Power
@@ -26,6 +26,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
   STG_OSCILLATOR_TYPE_TRIX,        // TRIX: Triple Exponential Average
   STG_OSCILLATOR_TYPE_UO,          // UO: Ultimate Oscillator
+  STG_OSCILLATOR_TYPE_WAD,         // WAD: Larry Williams' Accumulation/Distribution
   STG_OSCILLATOR_TYPE_WPR,         // WPR
   STG_OSCILLATOR_TYPE_VOL,         // VOL: Volumes
 };
@@ -149,6 +150,9 @@ INPUT int Oscillator_Indi_UO_InpMiddleK = 2;                                 // 
 INPUT int Oscillator_Indi_UO_InpSlowK = 1;                                   // Slow K
 INPUT int Oscillator_Indi_UO_Shift = 0;                                      // Shift
 INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_UO_SourceType = IDATA_BUILTIN;  // Source type
+INPUT_GROUP("Oscillator strategy: Williams' Accumulation/Distribution oscillator params");
+INPUT int Oscillator_Indi_WAD_Shift = 0;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_WAD_SourceType = IDATA_BUILTIN;  // Source type
 INPUT_GROUP("Oscillator strategy: WPR oscillator params");
 INPUT int Oscillator_Indi_WPR_Period = 18;  // Period
 INPUT int Oscillator_Indi_WPR_Shift = 0;    // Shift
@@ -283,6 +287,10 @@ class Stg_Oscillator : public Strategy {
       case STG_OSCILLATOR_TYPE_WPR:
         _result &= dynamic_cast<Indi_WPR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_WPR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
+      case STG_OSCILLATOR_TYPE_WAD:
+        _result &= dynamic_cast<Indi_WilliamsAD *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_WilliamsAD *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
       case STG_OSCILLATOR_TYPE_VOL:
         _result &= dynamic_cast<Indi_Volumes *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
@@ -474,6 +482,14 @@ class Stg_Oscillator : public Strategy {
         _indi_params.SetDataSourceType(::Oscillator_Indi_UO_SourceType);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_UltimateOscillator(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_WAD:  // Williams' AD
+      {
+        IndiWilliamsADParams _indi_params(::Oscillator_Indi_WAD_Shift);
+        _indi_params.SetDataSourceType(Oscillator_Indi_WAD_SourceType);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_WilliamsAD(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_WPR:  // WPR
