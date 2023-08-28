@@ -8,7 +8,12 @@
 
 // Includes EA31337 framework.
 #include <EA31337-classes/EA.mqh>
-#include <EA31337-classes/Indicators/Indi_Oscillator.mqh>
+#include <EA31337-classes/Indicators/Indi_AC.mqh>
+#include <EA31337-classes/Indicators/Indi_AD.mqh>
+#include <EA31337-classes/Indicators/Indi_RSI.mqh>
+#include <EA31337-classes/Indicators/Indi_Stochastic.mqh>
+#include <EA31337-classes/Indicators/Indi_WPR.mqh>
+// #include <EA31337-classes/Indicators/Oscillator/includes.h>
 #include <EA31337-classes/Strategy.mqh>
 
 // Inputs.
