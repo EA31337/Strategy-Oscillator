@@ -28,6 +28,7 @@
 #include <EA31337-classes/Indicators/Indi_RateOfChange.mqh>
 #include <EA31337-classes/Indicators/Indi_StdDev.mqh>
 #include <EA31337-classes/Indicators/Indi_Stochastic.mqh>
+#include <EA31337-classes/Indicators/Indi_TRIX.mqh>
 #include <EA31337-classes/Indicators/Indi_UltimateOscillator.mqh>
 #include <EA31337-classes/Indicators/Indi_WPR.mqh>
 // #include <EA31337-classes/Indicators/Oscillator/includes.h>

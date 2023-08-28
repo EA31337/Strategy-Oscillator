@@ -24,6 +24,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STDDEV,      // StdDev: Standard Deviation
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
+  STG_OSCILLATOR_TYPE_TRIX,        // TRIX: Triple Exponential Average
   STG_OSCILLATOR_TYPE_UO,          // UO: Ultimate Oscillator
   STG_OSCILLATOR_TYPE_WPR,         // WPR
 };
@@ -133,6 +134,11 @@ INPUT int Oscillator_Indi_Stochastic_Slowing = 12;                     // Slowin
 INPUT ENUM_MA_METHOD Oscillator_Indi_Stochastic_MA_Method = MODE_EMA;  // Moving Average method
 INPUT ENUM_STO_PRICE Oscillator_Indi_Stochastic_Price_Field = 0;       // Price (0 - Low/High or 1 - Close/Close)
 INPUT int Oscillator_Indi_Stochastic_Shift = 0;                        // Shift
+INPUT_GROUP("Oscillator strategy: TRIX oscillator params");
+INPUT int Oscillator_Indi_TRIX_InpPeriodEMA = 14;                              // EMA period
+INPUT ENUM_APPLIED_PRICE Oscillator_Indi_TRIX_Applied_Price = PRICE_WEIGHTED;  // Applied Price
+INPUT int Oscillator_Indi_TRIX_Shift = 0;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_TRIX_SourceType = IDATA_BUILTIN;  // Source type
 INPUT_GROUP("Oscillator strategy: Ultimate oscillator params");
 INPUT int Oscillator_Indi_UO_InpFastPeriod = 7;                              // Fast ATR period
 INPUT int Oscillator_Indi_UO_InpMiddlePeriod = 14;                           // Middle ATR period
@@ -260,6 +266,10 @@ class Stg_Oscillator : public Strategy {
       case STG_OSCILLATOR_TYPE_STOCH:
         _result &= dynamic_cast<Indi_Stochastic *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_Stochastic *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
+      case STG_OSCILLATOR_TYPE_TRIX:
+        _result &= dynamic_cast<Indi_TRIX *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_TRIX *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
       case STG_OSCILLATOR_TYPE_UO:
         _result &= dynamic_cast<Indi_UltimateOscillator *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
@@ -436,6 +446,14 @@ class Stg_Oscillator : public Strategy {
                                      ::Oscillator_Indi_Stochastic_Price_Field, ::Oscillator_Indi_Stochastic_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_Stochastic(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_TRIX:  // TRIX
+      {
+        IndiTRIXParams _indi_params(::Oscillator_Indi_TRIX_InpPeriodEMA, ::Oscillator_Indi_TRIX_Applied_Price,
+                                    ::Oscillator_Indi_RSI_Shift);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_TRIX(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_UO:  // UO
