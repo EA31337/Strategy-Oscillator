@@ -9,6 +9,8 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_AD,          // AD
   STG_OSCILLATOR_TYPE_AO,          // Awesome
   STG_OSCILLATOR_TYPE_ATR,         // ATR
+  STG_OSCILLATOR_TYPE_BEARS,       // Bears Power
+  STG_OSCILLATOR_TYPE_BULLS,       // Bulls Power
   STG_OSCILLATOR_TYPE_CCI,         // CCI
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
@@ -47,6 +49,14 @@ INPUT int Oscillator_Indi_ATR_Period = 13;  // Period
 INPUT int Oscillator_Indi_ATR_Shift = 0;    // Shift
 INPUT_GROUP("Oscillator strategy: Awesome oscillator params");
 INPUT int Oscillator_Indi_Awesome_Shift = 0;  // Shift
+INPUT_GROUP("Oscillator strategy: BearsPower oscillator params");
+INPUT int Oscillator_Indi_BearsPower_Period = 30;                                 // Period
+INPUT ENUM_APPLIED_PRICE Oscillator_Indi_BearsPower_Applied_Price = PRICE_CLOSE;  // Applied Price
+INPUT int Oscillator_Indi_BearsPower_Shift = 0;                                   // Shift
+INPUT_GROUP("Oscillator strategy: BullsPower oscillator params");
+INPUT int Oscillator_Indi_BullsPower_Period = 30;                                 // Period
+INPUT ENUM_APPLIED_PRICE Oscillator_Indi_BullsPower_Applied_Price = PRICE_CLOSE;  // Applied Price
+INPUT int Oscillator_Indi_BullsPower_Shift = 0;                                   // Shift
 INPUT_GROUP("Oscillator strategy: CCI oscillator params");
 INPUT int Oscillator_Indi_CCI_Period = 20;                                   // Period
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_CCI_Applied_Price = PRICE_TYPICAL;  // Applied Price
@@ -121,6 +131,14 @@ class Stg_Oscillator : public Strategy {
         _result &= dynamic_cast<Indi_ATR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_ATR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
+      case STG_OSCILLATOR_TYPE_BEARS:
+        _result &= dynamic_cast<Indi_BearsPower *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_BearsPower *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
+      case STG_OSCILLATOR_TYPE_BULLS:
+        _result &= dynamic_cast<Indi_BullsPower *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_BullsPower *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
       case STG_OSCILLATOR_TYPE_CCI:
         _result &= dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_CCI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
@@ -177,6 +195,24 @@ class Stg_Oscillator : public Strategy {
         IndiATRParams _indi_params(::Oscillator_Indi_ATR_Period, ::Oscillator_Indi_ATR_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_ATR(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_BEARS:  // Bears
+      {
+        IndiBearsPowerParams _indi_params(::Oscillator_Indi_BearsPower_Period,
+                                          ::Oscillator_Indi_BearsPower_Applied_Price,
+                                          ::Oscillator_Indi_BearsPower_Shift);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_BearsPower(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_BULLS:  // Bulls
+      {
+        IndiBullsPowerParams _indi_params(::Oscillator_Indi_BullsPower_Period,
+                                          ::Oscillator_Indi_BullsPower_Applied_Price,
+                                          ::Oscillator_Indi_BullsPower_Shift);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_BullsPower(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_CCI:  // CCI

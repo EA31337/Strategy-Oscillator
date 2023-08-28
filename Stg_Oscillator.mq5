@@ -13,6 +13,8 @@
 #include <EA31337-classes/Indicators/Indi_ADX.mqh>
 #include <EA31337-classes/Indicators/Indi_AO.mqh>
 #include <EA31337-classes/Indicators/Indi_ATR.mqh>
+#include <EA31337-classes/Indicators/Indi_BearsPower.mqh>
+#include <EA31337-classes/Indicators/Indi_BullsPower.mqh>
 #include <EA31337-classes/Indicators/Indi_CCI.mqh>
 #include <EA31337-classes/Indicators/Indi_RSI.mqh>
 #include <EA31337-classes/Indicators/Indi_Stochastic.mqh>
