@@ -27,6 +27,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_TRIX,        // TRIX: Triple Exponential Average
   STG_OSCILLATOR_TYPE_UO,          // UO: Ultimate Oscillator
   STG_OSCILLATOR_TYPE_WPR,         // WPR
+  STG_OSCILLATOR_TYPE_VOL,         // VOL: Volumes
 };
 
 // User input params.
@@ -151,6 +152,10 @@ INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_UO_SourceType = IDATA_BUILTIN;  // 
 INPUT_GROUP("Oscillator strategy: WPR oscillator params");
 INPUT int Oscillator_Indi_WPR_Period = 18;  // Period
 INPUT int Oscillator_Indi_WPR_Shift = 0;    // Shift
+INPUT_GROUP("Oscillator strategy: Volumes oscillator params");
+INPUT ENUM_APPLIED_VOLUME Oscillator_Indi_VOL_InpVolumeType = VOLUME_TICK;    // Volumes
+INPUT int Oscillator_Indi_VOL_Shift = 0;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_VOL_SourceType = IDATA_BUILTIN;  // Source type
 
 // Structs.
 
@@ -278,6 +283,10 @@ class Stg_Oscillator : public Strategy {
       case STG_OSCILLATOR_TYPE_WPR:
         _result &= dynamic_cast<Indi_WPR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_WPR *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
+      case STG_OSCILLATOR_TYPE_VOL:
+        _result &= dynamic_cast<Indi_Volumes *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_Volumes *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
       default:
         break;
@@ -472,6 +481,14 @@ class Stg_Oscillator : public Strategy {
         IndiWPRParams _indi_params(::Oscillator_Indi_WPR_Period, ::Oscillator_Indi_WPR_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_WPR(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_VOL:  // Volumes
+      {
+        IndiVolumesParams _indi_params(::Oscillator_Indi_VOL_InpVolumeType, ::Oscillator_Indi_VOL_Shift);
+        _indi_params.SetDataSourceType(::Oscillator_Indi_VOL_SourceType);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_Volumes(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_0_NONE:  // (None)
