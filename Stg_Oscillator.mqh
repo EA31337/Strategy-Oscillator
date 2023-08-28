@@ -16,6 +16,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_CHO,         // Chaikin
   STG_OSCILLATOR_TYPE_CHV,         // Chaikin Volatility
   STG_OSCILLATOR_TYPE_DEMARKER,    // DeMarker
+  STG_OSCILLATOR_TYPE_MFI,         // MFI
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
   STG_OSCILLATOR_TYPE_WPR,         // WPR
@@ -82,11 +83,16 @@ INPUT ENUM_CHV_SMOOTH_METHOD Oscillator_Indi_CHV_Smooth_Method;               //
 INPUT int Oscillator_Indi_CHV_Shift = 0;                                      // Shift
 INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_CHV_SourceType = IDATA_BUILTIN;  // Source type
 INPUT_GROUP("Oscillator strategy: DeMarker indicator params");
-INPUT int Oscillator_Indi_DeMarker_Period = 23;  // Period
-INPUT int Oscillator_Indi_DeMarker_Shift = 0;    // Shift
+INPUT int Oscillator_Indi_DeMarker_Period = 23;                                    // Period
+INPUT int Oscillator_Indi_DeMarker_Shift = 0;                                      // Shift
 INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_DeMarker_SourceType = IDATA_BUILTIN;  // Source type
+INPUT_GROUP("MFI strategy: MFI indicator params");
+INPUT int MFI_Indi_MFI_MA_Period = 22;                                           // MA Period
+INPUT ENUM_APPLIED_VOLUME MFI_Indi_MFI_Applied_Volume = (ENUM_APPLIED_VOLUME)0;  // Applied volume.
+INPUT int MFI_Indi_MFI_Shift = 0;                                                // Shift
 INPUT_GROUP("Oscillator strategy: RSI oscillator params");
 INPUT int Oscillator_Indi_RSI_Period = 16;                                    // Period
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_MFI_SourceType = IDATA_BUILTIN;  // Source type
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_RSI_Applied_Price = PRICE_WEIGHTED;  // Applied Price
 INPUT int Oscillator_Indi_RSI_Shift = 0;                                      // Shift
 INPUT_GROUP("Oscillator strategy: Stochastic oscillator params");
@@ -182,6 +188,10 @@ class Stg_Oscillator : public Strategy {
       case STG_OSCILLATOR_TYPE_DEMARKER:
         _result &= dynamic_cast<Indi_DeMarker *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_DeMarker *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
+      case STG_OSCILLATOR_TYPE_MFI:
+        _result &= dynamic_cast<Indi_MFI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_MFI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
       case STG_OSCILLATOR_TYPE_RSI:
         _result &= dynamic_cast<Indi_RSI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
@@ -287,6 +297,14 @@ class Stg_Oscillator : public Strategy {
         _indi_params.SetDataSourceType(::Oscillator_Indi_CHV_SourceType);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_CHV(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_MFI:  // MFI
+      {
+        IndiMFIParams _indi_params(::MFI_Indi_MFI_MA_Period, ::MFI_Indi_MFI_Applied_Volume, ::MFI_Indi_MFI_Shift);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        _indi_params.SetDataSourceType(::Oscillator_Indi_MFI_SourceType);
+        SetIndicator(new Indi_MFI(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_RSI:  // RSI
