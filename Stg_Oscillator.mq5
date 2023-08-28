@@ -18,6 +18,7 @@
 #include <EA31337-classes/Indicators/Indi_BullsPower.mqh>
 #include <EA31337-classes/Indicators/Indi_CCI.mqh>
 #include <EA31337-classes/Indicators/Indi_CHO.mqh>
+#include <EA31337-classes/Indicators/Indi_CHV.mqh>
 #include <EA31337-classes/Indicators/Indi_RSI.mqh>
 #include <EA31337-classes/Indicators/Indi_Stochastic.mqh>
 #include <EA31337-classes/Indicators/Indi_WPR.mqh>

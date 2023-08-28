@@ -14,6 +14,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_BWMFI,       // BWMFI
   STG_OSCILLATOR_TYPE_CCI,         // CCI
   STG_OSCILLATOR_TYPE_CHO,         // Chaikin
+  STG_OSCILLATOR_TYPE_CHV,         // Chaikin Volatility
   STG_OSCILLATOR_TYPE_RSI,         // RSI
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
   STG_OSCILLATOR_TYPE_WPR,         // WPR
@@ -67,12 +68,18 @@ INPUT int Oscillator_Indi_CCI_Period = 20;                                   // 
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_CCI_Applied_Price = PRICE_TYPICAL;  // Applied Price
 INPUT int Oscillator_Indi_CCI_Shift = 0;                                     // Shift
 INPUT_GROUP("Oscillator strategy: Chaikin oscillator params");
-INPUT int Oscillator_Indi_Chaikin_InpFastMA = 10;                                 // Fast EMA period
-INPUT int Oscillator_Indi_Chaikin_InpSlowMA = 30;                                 // Slow MA period
-INPUT ENUM_MA_METHOD Oscillator_Indi_Chaikin_InpSmoothMethod = MODE_SMMA;         // MA method
-INPUT ENUM_APPLIED_VOLUME Oscillator_Indi_Chaikin_InpVolumeType = VOLUME_TICK;    // Volumes
-INPUT int Oscillator_Indi_Chaikin_Shift = 0;                                      // Shift
-INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_Chaikin_SourceType = IDATA_BUILTIN;  // Source type
+INPUT int Oscillator_Indi_CHO_InpFastMA = 10;                                 // Fast EMA period
+INPUT int Oscillator_Indi_CHO_InpSlowMA = 30;                                 // Slow MA period
+INPUT ENUM_MA_METHOD Oscillator_Indi_CHO_InpSmoothMethod = MODE_SMMA;         // MA method
+INPUT ENUM_APPLIED_VOLUME Oscillator_Indi_CHO_InpVolumeType = VOLUME_TICK;    // Volumes
+INPUT int Oscillator_Indi_CHO_Shift = 0;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_CHO_SourceType = IDATA_BUILTIN;  // Source type
+INPUT_GROUP("Oscillator strategy: Chaikin Volatility oscillator params");
+INPUT unsigned int Oscillator_Indi_CHV_Smooth_Period;                         // Smooth period
+INPUT unsigned int Oscillator_Indi_CHV_Period;                                // Period
+INPUT ENUM_CHV_SMOOTH_METHOD Oscillator_Indi_CHV_Smooth_Method;               // Smooth method
+INPUT int Oscillator_Indi_CHV_Shift = 0;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_CHV_SourceType = IDATA_BUILTIN;  // Source type
 INPUT_GROUP("Oscillator strategy: RSI oscillator params");
 INPUT int Oscillator_Indi_RSI_Period = 16;                                    // Period
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_RSI_Applied_Price = PRICE_WEIGHTED;  // Applied Price
@@ -163,6 +170,10 @@ class Stg_Oscillator : public Strategy {
         _result &= dynamic_cast<Indi_CHO *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_CHO *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
+      case STG_OSCILLATOR_TYPE_CHV:
+        _result &= dynamic_cast<Indi_CHV *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_CHV *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
       case STG_OSCILLATOR_TYPE_RSI:
         _result &= dynamic_cast<Indi_RSI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_RSI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
@@ -250,14 +261,23 @@ class Stg_Oscillator : public Strategy {
         SetIndicator(new Indi_CCI(_indi_params), ::Oscillator_Type);
         break;
       }
-      case STG_OSCILLATOR_TYPE_CHO:  // Chaikin
+      case STG_OSCILLATOR_TYPE_CHO:  // Chaikin (CHO)
       {
-        IndiCHOParams _indi_params(::Oscillator_Indi_Chaikin_InpFastMA, ::Oscillator_Indi_Chaikin_InpSlowMA,
-                                   ::Oscillator_Indi_Chaikin_InpSmoothMethod, ::Oscillator_Indi_Chaikin_InpVolumeType,
-                                   ::Oscillator_Indi_Chaikin_Shift);
-        _indi_params.SetDataSourceType(::Oscillator_Indi_Chaikin_SourceType);
+        IndiCHOParams _indi_params(::Oscillator_Indi_CHO_InpFastMA, ::Oscillator_Indi_CHO_InpSlowMA,
+                                   ::Oscillator_Indi_CHO_InpSmoothMethod, ::Oscillator_Indi_CHO_InpVolumeType,
+                                   ::Oscillator_Indi_CHO_Shift);
+        _indi_params.SetDataSourceType(::Oscillator_Indi_CHO_SourceType);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_CHO(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_CHV:  // Chaikin Volatility (CHV)
+      {
+        IndiCHVParams _indi_params(::Oscillator_Indi_CHV_Smooth_Period, ::Oscillator_Indi_CHV_Period,
+                                   ::Oscillator_Indi_CHV_Smooth_Method, ::Oscillator_Indi_CHV_Shift);
+        _indi_params.SetDataSourceType(::Oscillator_Indi_CHV_SourceType);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_CHV(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_RSI:  // RSI
