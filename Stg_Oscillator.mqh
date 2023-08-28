@@ -20,6 +20,7 @@ enum ENUM_STG_OSCILLATOR_TYPE {
   STG_OSCILLATOR_TYPE_MOM,         // MOM: Momentum
   STG_OSCILLATOR_TYPE_OBV,         // OBV: On Balance Volume
   STG_OSCILLATOR_TYPE_RSI,         // RSI
+  STG_OSCILLATOR_TYPE_STDDEV,      // StdDev: Standard Deviation
   STG_OSCILLATOR_TYPE_STOCH,       // Stochastic
   STG_OSCILLATOR_TYPE_WPR,         // WPR
 };
@@ -106,6 +107,13 @@ INPUT_GROUP("Oscillator strategy: RSI oscillator params");
 INPUT int Oscillator_Indi_RSI_Period = 16;                                    // Period
 INPUT ENUM_APPLIED_PRICE Oscillator_Indi_RSI_Applied_Price = PRICE_WEIGHTED;  // Applied Price
 INPUT int Oscillator_Indi_RSI_Shift = 0;                                      // Shift
+INPUT_GROUP("Oscillator strategy: StdDev oscillator params");
+INPUT int Oscillator_Indi_StdDev_MA_Period = 24;                                 // Period
+INPUT int Oscillator_Indi_StdDev_MA_Shift = 0;                                   // MA Shift
+INPUT ENUM_MA_METHOD Oscillator_Indi_StdDev_MA_Method = (ENUM_MA_METHOD)3;       // MA Method
+INPUT ENUM_APPLIED_PRICE Oscillator_Indi_StdDev_Applied_Price = PRICE_WEIGHTED;  // Applied Price
+INPUT int Oscillator_Indi_StdDev_Shift = 0;                                      // Shift
+INPUT ENUM_IDATA_SOURCE_TYPE Oscillator_Indi_StdDev_SourceType = IDATA_BUILTIN;  // Source type
 INPUT_GROUP("Oscillator strategy: Stochastic oscillator params");
 INPUT int Oscillator_Indi_Stochastic_KPeriod = 8;                      // K line period
 INPUT int Oscillator_Indi_Stochastic_DPeriod = 12;                     // D line period
@@ -215,6 +223,10 @@ class Stg_Oscillator : public Strategy {
       case STG_OSCILLATOR_TYPE_RSI:
         _result &= dynamic_cast<Indi_RSI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
                    dynamic_cast<Indi_RSI *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
+        break;
+      case STG_OSCILLATOR_TYPE_STDDEV:
+        _result &= dynamic_cast<Indi_StdDev *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
+                   dynamic_cast<Indi_StdDev *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift + 1);
         break;
       case STG_OSCILLATOR_TYPE_STOCH:
         _result &= dynamic_cast<Indi_Stochastic *>(_indi).GetFlag(INDI_ENTRY_FLAG_IS_VALID, _shift) &&
@@ -355,6 +367,16 @@ class Stg_Oscillator : public Strategy {
         IndiDeMarkerParams _indi_params(::Oscillator_Indi_DeMarker_Period, ::Oscillator_Indi_DeMarker_Shift);
         _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
         SetIndicator(new Indi_DeMarker(_indi_params), ::Oscillator_Type);
+        break;
+      }
+      case STG_OSCILLATOR_TYPE_STDDEV:  // StdDev
+      {
+        IndiStdDevParams _indi_params(::Oscillator_Indi_StdDev_MA_Period, ::Oscillator_Indi_StdDev_MA_Shift,
+                                      ::Oscillator_Indi_StdDev_MA_Method, ::Oscillator_Indi_StdDev_Applied_Price,
+                                      ::Oscillator_Indi_StdDev_Shift);
+        _indi_params.SetDataSourceType(::Oscillator_Indi_StdDev_SourceType);
+        _indi_params.SetTf(Get<ENUM_TIMEFRAMES>(STRAT_PARAM_TF));
+        SetIndicator(new Indi_StdDev(_indi_params), ::Oscillator_Type);
         break;
       }
       case STG_OSCILLATOR_TYPE_STOCH:  // Stochastic
